@@ -1,0 +1,81 @@
+import { select, input } from '@inquirer/prompts';
+import { apiClient } from '../apiClient';
+import { clearScreen, pressEnterToContinue, handleError } from '../utils';
+
+const ENDPOINT = '/pagamentos';
+
+export async function menuPagamento() {
+    let sair = false;
+    while (!sair) {
+        clearScreen();
+        const opcao = await select({
+            message: 'Gerenciamento de Pagamentos:',
+            choices: [
+                { name: '[1] Listar', value: '1' },
+                { name: '[2] Buscar por ID', value: '2' },
+                { name: '[3] Cadastrar', value: '3' },
+                { name: '[4] Atualizar', value: '4' },
+                { name: '[5] Excluir', value: '5' },
+                { name: '[0] Voltar', value: '0' },
+            ],
+        });
+
+        try {
+            switch (opcao) {
+                case '1':
+                    console.log('⏳ Buscando...');
+                    const lista = await apiClient.get(ENDPOINT);
+                    console.table(lista);
+                    await pressEnterToContinue();
+                    break;
+                case '2':
+                    const idBusca = await input({ message: 'Digite o ID:' });
+                    const item = await apiClient.get(`${ENDPOINT}/${idBusca}`);
+                    console.table([item]);
+                    await pressEnterToContinue();
+                    break;
+                case '3':
+                    const tipo_pagamento = await input({ message: 'Tipo (ex: Pix, Cartão):' });
+                    const valor = await input({ message: 'Valor:' });
+                    const data_pagamento = await input({ message: 'Data Pagamento (YYYY-MM-DD):' });
+                    const id_pedido = await input({ message: 'ID Pedido:' });
+                    await apiClient.post(ENDPOINT, { tipo_pagamento, valor: parseFloat(valor), data_pagamento, id_pedido });
+                    console.log('\n✅ Cadastrado com sucesso!');
+                    await pressEnterToContinue();
+                    break;
+                case '4':
+                    const idAtualizar = await input({ message: 'Digite o ID a atualizar:' });
+                    const atual = await apiClient.get(`${ENDPOINT}/${idAtualizar}`);
+                    
+                    const dataLimpa = atual.data_pagamento ? atual.data_pagamento.split('T')[0] : '';
+
+                    const nTipo = await input({ message: 'Tipo:', default: atual.tipo_pagamento });
+                    const nValor = await input({ message: 'Valor:', default: String(atual.valor) });
+                    const nData = await input({ message: 'Data:', default: dataLimpa });
+                    const nPed = await input({ message: 'ID Pedido:', default: String(atual.id_pedido) });
+
+                    await apiClient.put(`${ENDPOINT}/${idAtualizar}`, { 
+                        tipo_pagamento: nTipo, 
+                        valor: parseFloat(nValor), 
+                        data_pagamento: nData, 
+                        id_pedido: parseInt(nPed) 
+                    });
+                    console.log('\n✅ Atualizado com sucesso!');
+                    await pressEnterToContinue();
+                    break;
+                case '5':
+                    const idExcluir = await input({ message: 'Digite o ID a excluir:' });
+                    await apiClient.del(`${ENDPOINT}/${idExcluir}`);
+                    console.log('\n✅ Excluído com sucesso!');
+                    await pressEnterToContinue();
+                    break;
+                case '0':
+                    sair = true;
+                    break;
+            }
+        } catch (error) {
+            handleError(error);
+            await pressEnterToContinue();
+        }
+    }
+}

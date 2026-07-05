@@ -1,0 +1,66 @@
+# =========================
+# Backend
+# =========================
+backend/node_modules/
+backend/dist/
+backend/build/
+backend/coverage/
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/*.tsbuildinfo
+
+# =========================
+# Frontend (caso exista)
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/coverage/
+frontend/.next/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+frontend/*.tsbuildinfo
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# =========================
+# VS Code
+# =========================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# =========================
+# Sistema Operacional
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Arquivos temporários
+# =========================
+tmp/
+temp/
+*.tmp
+
+# =========================
+# Arquivos gerados
+# =========================
+grafico_temp.png
+
+# =========================
+# Dumps de banco
+# =========================
+*.sql
+*.dump
+*.bak
